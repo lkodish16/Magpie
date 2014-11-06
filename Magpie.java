@@ -46,65 +46,133 @@ public class Magpie
     {
       response = "Say, something please.";
     }
-    else if (statement.indexOf("mother") >= 0
-               || statement.indexOf("father") >= 0
-               || statement.indexOf("sister") >= 0
-               || statement.indexOf("brother") >= 0)
+    else if (findKeyword(statement, "mother", 0) >= 0
+               || findKeyword(statement, "father", 0) >= 0
+               || findKeyword(statement, "sister", 0) >= 0
+               || findKeyword(statement, "brother", 0) >= 0)
     {
       response = "Tell me more about your family.";
     } 
     // gives response if teacher's name is mentioned
-    else if (statement.indexOf("Kiang") >= 0)
+    else if (findKeyword(statement, "Kiang", 0) >= 0)
     {
       response = "I bet he has very nice facial hair.";
     }
-    else if (statement.indexOf("Landgraf") >= 0)
+    else if (findKeyword(statement, "Landgraf", 0) >= 0)
     {
       response = "I bet he's an awesome teacher.";
     }
     // gives response when user mentions a pet 
-    else if (statement.indexOf("dog") >= 0
-               || statement.indexOf("cat") >= 0
-               || statement.indexOf("rabbit") >= 0
-               || statement.indexOf("fish") >= 0
-               || statement.indexOf("turtle") >= 0)
+    else if (findKeyword(statement, "dog", 0) >= 0
+               || findKeyword(statement, "cat", 0) >= 0
+               || findKeyword(statement, "rabbit", 0) >= 0
+               || findKeyword(statement, "fish", 0) >= 0
+               || findKeyword(statement, "turtle", 0) >= 0)
     {
       response = "Tell me more about your pets.";
     }
     // more keywords
-    else if (statement.indexOf("math") >= 0
-               || statement.indexOf("english") >= 0 
-               || statement.indexOf("social studies") >= 0
-               || statement.indexOf("language") >= 0
-               || statement.indexOf("science") >= 0)
+    else if (findKeyword(statement, "math", 0) >= 0
+               || findKeyword(statement, "english", 0) >= 0 
+               || findKeyword(statement, "social studies", 0) >= 0
+               || findKeyword(statement, "language", 0) >= 0
+               || findKeyword(statement, "science", 0) >= 0)
     {
       response = "Tell me more about your favorite subject.";
     }
-    else if (statement.indexOf("football") >= 0
-               || statement.indexOf("soccer") >= 0
-               || statement.indexOf("running") >= 0
-               || statement.indexOf("basketball") >= 0
-               || statement.indexOf("hockey") >= 0 
-               || statement.indexOf("swimming") >= 0
-               || statement.indexOf("baseball") >= 0)
+    else if (findKeyword(statement, "football", 0) >= 0
+               || findKeyword(statement, "soccer", 0) >= 0
+               || findKeyword(statement, "running", 0) >= 0
+               || findKeyword(statement, "basketball", 0) >= 0
+               || findKeyword(statement, "hockey", 0) >= 0 
+               || findKeyword(statement, "swimming", 0) >= 0
+               || findKeyword(statement, "baseball", 0) >= 0)
     {
       response = "Tell me more about your favorite sport.";
     }
-    else if (statement.indexOf("uncle") >= 0
-               || statement.indexOf("aunt") >= 0
-               || statement.indexOf("cousin") >= 0
-               || statement.indexOf("nephew") >= 0
-               || statement.indexOf("niece") >= 0) 
+    else if (findKeyword(statement, "uncle", 0) >= 0
+               || findKeyword(statement, "aunt", 0) >= 0
+               || findKeyword(statement, "cousin", 0) >= 0
+               || findKeyword(statement, "nephew", 0) >= 0
+               || findKeyword(statement, "niece", 0) >= 0) 
     {
-     response = "Tell me more about your relatives.";
+      response = "Tell me more about your relatives.";
     }          
-           
+    
     else
     {
       response = getRandomResponse();
     }
     return response;
   }
+  
+  
+  /**
+   * Search for one word in phrase. The search is not case
+   * sensitive. This method will check that the given goal
+   * is not a substring of a longer string (so, for
+   * example, "I know" does not contain "no").
+   * 
+   * @param statement
+   *            the string to search
+   * @param goal
+   *            the string to search for
+   * @param startPos
+   *            the character of the string to begin the
+   *            search at
+   * @return the index of the first occurrence of goal in
+   *         statement or -1 if it's not found
+   */
+  private int findKeyword(String statement, String goal,
+                          int startPos)
+  {
+    String phrase = statement.trim();
+    // The only change to incorporate the startPos is in
+    // the line below
+    int psn = phrase.toLowerCase().indexOf(
+                                           goal.toLowerCase(), startPos);
+    
+    // Refinement--make sure the goal isn't part of a
+    // word
+    while (psn >= 0)
+    {
+      // Find the string of length 1 before and after
+      // the word
+      String before = " ", after = " ";
+      if (psn > 0)
+      {
+        before = phrase.substring(psn - 1, psn)
+          .toLowerCase();
+      }
+      if (psn + goal.length() < phrase.length())
+      {
+        after = phrase.substring(
+                                 psn + goal.length(),
+                                 psn + goal.length() + 1)
+          .toLowerCase();
+      }
+      
+      // If before and after aren't letters, we've
+      // found the word
+      if (((before.compareTo("a") < 0) || (before
+                                             .compareTo("z") > 0)) // before is not a
+            // letter
+            && ((after.compareTo("a") < 0) || (after
+                                                 .compareTo("z") > 0)))
+      {
+        return psn;
+      }
+      
+      // The last position didn't work, so let's find
+      // the next, if there is one.
+      psn = phrase.indexOf(goal.toLowerCase(),
+                           psn + 1);
+      
+    }
+    
+    return -1;
+  }
+  
   
   /**
    * Pick a default response to use if nothing else fits.

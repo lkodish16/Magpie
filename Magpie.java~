@@ -30,6 +30,11 @@ public class Magpie
    */
   public String getResponse(String statement)
   {
+    /* if more than one keyword appears in the statement, then the output depends
+     * on what keyword you check for first. So prioritize your keywords by checking 
+     * some first and others after.
+     */
+    // change the input to lowercase characters so the checks are not case-sensitive
     statement = statement.toLowerCase();
     String response = "";
     if (statement.indexOf("no") >= 0)
@@ -67,8 +72,33 @@ public class Magpie
       response = "Tell me more about your pets.";
     }
     // more keywords
-    
-    
+    else if (statement.indexOf("math") >= 0
+               || statement.indexOf("english") >= 0 
+               || statement.indexOf("social studies") >= 0
+               || statement.indexOf("language") >= 0
+               || statement.indexOf("science") >= 0)
+    {
+      response = "Tell me more about your favorite subject.";
+    }
+    else if (statement.indexOf("football") >= 0
+               || statement.indexOf("soccer") >= 0
+               || statement.indexOf("running") >= 0
+               || statement.indexOf("basketball") >= 0
+               || statement.indexOf("hockey") >= 0 
+               || statement.indexOf("swimming") >= 0
+               || statement.indexOf("baseball") >= 0)
+    {
+      response = "Tell me more about your favorite sport.";
+    }
+    else if (statement.indexOf("uncle") >= 0
+               || statement.indexOf("aunt") >= 0
+               || statement.indexOf("cousin") >= 0
+               || statement.indexOf("nephew") >= 0
+               || statement.indexOf("niece") >= 0) 
+    {
+     response = "Tell me more about your relatives.";
+    }          
+           
     else
     {
       response = getRandomResponse();
