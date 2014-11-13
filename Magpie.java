@@ -1,3 +1,5 @@
+import java.util.Random;
+
 /**
  * A program to carry on conversations with a human user.
  * This is the initial version that:  
@@ -96,9 +98,13 @@ public class Magpie
                || findKeyword(statement, "nephew", 0) >= 0
                || findKeyword(statement, "niece", 0) >= 0) 
     {
-      response = "Tell me more about your relatives.";
+      response = "Tell me more about your relatives."; 
     }   
     // Responses which require transformations
+    else if (findKeyword(statement, "I said", 0) >= 0)
+    {
+      return "Why do you say that?";
+    }
     else if (findKeyword(statement, "I want to", 0) >= 0)  // looks for an "I want to" statement. This gets priority over just an "I want" statement
     {
       response = transformIWantToStatement(statement);  // if found, call the transformIWantToStatement method
@@ -108,14 +114,30 @@ public class Magpie
       response = transformIWantStatement(statement);  // if found, call the transformIWantStatement method
     }
     else if (findKeyword(statement, "I", 0) >= 0
-            && findKeyword(statement, "you", statement.length()-4) >= 0)  // looks for an "I something you" statement
+               && findKeyword(statement, "you", statement.length()-4) >= 0)  // looks for an "I something you" statement
     {
       response = transformIYouStatement(statement);
     }
+    else if (findKeyword(statement, "is", 0) >= 0)  // looks for an "is" statement
+    {
+      response = transformIsStatement(statement);  // if found, call the transformIsStatement method
+    }
+    else if (findKeyword(statement, "are", 0) >= 0 && (findKeyword(statement, "you", 0) < 0))  // looks for statement that has "are", but not "you"
+    {
+      response = transformAreStatement(statement);  // if there is an "are", but no "you", call the transformAreStatement method
+    }
+    else if (findKeyword(statement, "was", 0) >= 0)  // looks for a statement with "was"
+    {
+      response = transformWasToQuestion(statement);  // if found, call the transformWasToQuestion method
+    }
+    else if (findKeyword(statement, "You are", 0) >= 0)  // looks for a "you are" statement
+    {
+      response = transformYouAreToQuestion(statement);
+    }
+    
     else
     {
-      // Look for a two word (you <something> me)
-      // pattern
+      // Look for a two word (you <something> me) 
       int psn = findKeyword(statement, "you", 0);
       
       if (psn >= 0
@@ -166,8 +188,6 @@ public class Magpie
     String restOfStatement = statement.substring(psn + 6).trim();  // restOfStatemt starts from "I want", and goes through to the end
     return "Would you be really happy if you had " + restOfStatement + "?";
   }
-     
-      
   
   /**
    * Take a statement with "you <something> me" and transform it into 
@@ -207,6 +227,62 @@ public class Magpie
     return "Why do you " + restOfStatement + " me?";  // use restOfStatement to make a question
   }
   
+  private String transformIsStatement(String statement)
+  {
+    // remove the final period, if there is one
+    statement = statement.trim();
+    String lastChar = statement.substring(statement.length()-1);
+    if (lastChar.equals("."))
+    {
+      statement = statement.substring(0, statement.length()-1);
+    }
+    int psnOfIs = findKeyword(statement, "is", 0);
+    String restOfStatement = statement.substring(0, psnOfIs).trim() + " " + statement.substring(psnOfIs+2).trim();  // restOfStatement is statement without "is"
+    return "Why is " + restOfStatement + "?";
+  }
+  
+  private String transformAreStatement(String statement) 
+  {
+    // Remove the final period, if there is one
+    statement = statement.trim();
+    String lastChar = statement.substring(statement.length()-1);
+    if (lastChar.equals(".")) 
+    {
+      statement = statement.substring(0, statement.length()-1);
+    }
+    int psnOfAre = findKeyword(statement, "are", 0);
+    String restOfStatement = statement.substring(0, psnOfAre).trim() + " " + statement.substring(psnOfAre+3).trim();  // restOfStatement is statement without "are"
+    return "Why are " + restOfStatement + "?";
+  }
+  
+  private String transformWasToQuestion(String statement)
+  {
+    // Remove the final period, if there is one
+    statement = statement.trim();
+    String lastChar = statement.substring(statement.length()-1);
+    if (lastChar.equals(".")) 
+    {
+      statement = statement.substring(0, statement.length()-1);
+    }
+    int psnOfWas = findKeyword(statement, "was", 0);
+    String restOfStatement = statement.substring(0, psnOfWas).trim() + " " + statement.substring(psnOfWas+3).trim();
+    return "Why was " + restOfStatement + "?";
+  }
+  
+  private String transformYouAreToQuestion(String statement)
+  {
+    // Remove the final period, if there is one
+    statement = statement.trim();
+    String lastChar = statement.substring(0, statement.length()-1);
+    if  (lastChar.equals("."))
+    {
+      statement = statement.substring(0, statement.length()-1);
+    }
+    int psnOfYouAre = findKeyword(statement, "You are", 0);
+    String restOfStatement = statement.substring(0, psnOfYouAre).trim() + " " + statement.substring(psnOfYouAre+7).trim();
+    return "Why am I" + restOfStatement + "?";
+  }
+  
   /**
    * Search for one word in phrase. The search is not case
    * sensitive. This method will check that the given goal
@@ -229,8 +305,7 @@ public class Magpie
     String phrase = statement.trim();
     // The only change to incorporate the startPos is in
     // the line below
-    int psn = phrase.toLowerCase().indexOf(
-                                           goal.toLowerCase(), startPos);
+    int psn = phrase.toLowerCase().indexOf(goal.toLowerCase(), startPos);
     
     // Refinement--make sure the goal isn't part of a
     // word
@@ -273,48 +348,30 @@ public class Magpie
   
   private int findKeyword(String statement, String goal)
   {
-    return findKeyword (statement, goal, 0);
+    return findKeyword(statement, goal, 0);
   }
   
   /**
    * Pick a default response to use if nothing else fits.
    * @return a non-committal string
    */
-  private String getRandomResponse()
+  private String getRandomResponse ()
   {
-    final int NUMBER_OF_RESPONSES = 6;
-    double r = Math.random();
-    int whichResponse = (int)(r * NUMBER_OF_RESPONSES);
-    String response = "";
-    
-    if (whichResponse == 0)
-    {
-      response = "Interesting, tell me more.";
-    }
-    else if (whichResponse == 1)
-    {
-      response = "Hmmm.";
-    }
-    else if (whichResponse == 2)
-    {
-      response = "Do you really think so?";
-    }
-    else if (whichResponse == 3)
-    {
-      response = "You don't say.";
-    }
-    // two more non-commital responses
-    else if (whichResponse == 4)
-    {
-      response = "Wow, keep talking.";
-    }
-    else if (whichResponse  == 5)
-    {
-      response = "Let me know more about that.";
-    }
-    
-    return response;
+    Random r = new Random ();
+    return randomResponses [r.nextInt(randomResponses.length)];
   }
+  
+  private String [] randomResponses = {"Interesting, tell me more",
+    "Hmmm.",
+    "Do you really think so?",
+    "You don't say.",
+    "Wow, keep talking.",
+    "Let me know more about that.",
+    "That's very interesting.",
+    "Are you serious?",
+    "Uh Uh.",
+    "Really?"
+  };
 }
 
 
