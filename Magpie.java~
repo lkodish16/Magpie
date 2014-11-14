@@ -101,6 +101,10 @@ public class Magpie
       response = "Tell me more about your relatives."; 
     }   
     // Responses which require transformations
+    else if (findKeyword(statement, "I said", 0) >= 0)
+    {
+      return "Why do you say that?";
+    }
     else if (findKeyword(statement, "I want to", 0) >= 0)  // looks for an "I want to" statement. This gets priority over just an "I want" statement
     {
       response = transformIWantToStatement(statement);  // if found, call the transformIWantToStatement method
@@ -269,8 +273,15 @@ public class Magpie
   {
     // Remove the final period, if there is one
     statement = statement.trim();
-    String lasChar = statement.substring(0, statement.length()-1)
- 
+    String lastChar = statement.substring(0, statement.length()-1);
+    if  (lastChar.equals("."))
+    {
+      statement = statement.substring(0, statement.length()-1);
+    }
+    int psnOfYouAre = findKeyword(statement, "You are", 0);
+    String restOfStatement = statement.substring(0, psnOfYouAre).trim() + " " + statement.substring(psnOfYouAre+7).trim();
+    return "Why am I" + restOfStatement + "?";
+  }
   
   /**
    * Search for one word in phrase. The search is not case

@@ -41,7 +41,7 @@ public class Magpie
     String response = "";
     if (statement.indexOf("no") >= 0)
     {
-      response = "Why so negative?";
+      response = "Why so negative?"; 
     }
     // checks if nothing or just spaces have been inputted
     else if (statement.trim().length() == 0)
@@ -126,13 +126,25 @@ public class Magpie
     {
       response = transformAreStatement(statement);  // if there is an "are", but no "you", call the transformAreStatement method
     }
-    else if (findKeyword(statement, "was", 0) >= 0)  // looks for a statement with "was"
+    else if (findKeyword(statement, "was", 0) >= 0)  // looks for a statement with "was" in it
     {
       response = transformWasToQuestion(statement);  // if found, call the transformWasToQuestion method
     }
     else if (findKeyword(statement, "You are", 0) >= 0)  // looks for a "you are" statement
     {
       response = transformYouAreToQuestion(statement);
+    }
+    else if (findKeyword(statement, "I have", 0) >= 0)  // looks for a statement with "I have" in it
+    {
+      response = transformIHaveToQuestion(statement);  // if found, call the transformIHaveToQuestion method
+    }
+    else if (findKeyword(statement, "You have", 0) >= 0)  // looks for a statement with "You have" in it
+    {
+      response = transformYouHaveToQuestion(statement);  // if found, call the transformYouHaveToQuestion method
+    }
+    else if (findKeyword(statement, "has", 0) >= 0)  // looks for a statement with "has" in it
+    {
+      response = transformHasToHaveQuestion(statement);  // if found, call the transformHasToHaveQuestion method
     }
     
     else
@@ -172,7 +184,7 @@ public class Magpie
     }
     int psn = findKeyword(statement, "I want to", 0);  // find the index of "I want to"
     String restOfStatement = statement.substring(psn + 9).trim();  // restOfStatement starts from "I want to", and goes through to the end
-    return "What would it mean to " + restOfStatement + "?";  // uses restOfStatement to create a question
+    return "What would it mean to " + restOfStatement + "?";  // use restOfStatement to make a "What would it mean to __?" question
   }
   
   private String transformIWantStatement(String statement)
@@ -186,7 +198,7 @@ public class Magpie
     }
     int psn = findKeyword(statement, "I want", 0);  // find the index of "I want"
     String restOfStatement = statement.substring(psn + 6).trim();  // restOfStatemt starts from "I want", and goes through to the end
-    return "Would you be really happy if you had " + restOfStatement + "?";
+    return "Would you be really happy if you had " + restOfStatement + "?";  // use restOfStatement to make a "Would you be really happy if you had __?" question
   }
   
   /**
@@ -211,7 +223,7 @@ public class Magpie
     int psnOfMe = findKeyword (statement, "me", psnOfYou + 3);
     
     String restOfStatement = statement.substring(psnOfYou + 3, psnOfMe).trim();  // restOfStatement is what comes after "you," to what comes before "me"
-    return "What makes you think that I " + restOfStatement + " you?";  // uses restOfStatement to make a question
+    return "What makes you think that I " + restOfStatement + " you?";  // use restOfStatement to make "What makes you think that I __ you" question
   }
   
   private String transformIYouStatement(String statement) 
@@ -224,7 +236,7 @@ public class Magpie
       statement = statement.substring(0, statement.length()-1);
     }
     String restOfStatement = statement.substring(1, statement.length()-3).trim();  // restOfStatement is what's between "I" and "You"
-    return "Why do you " + restOfStatement + " me?";  // use restOfStatement to make a question
+    return "Why do you " + restOfStatement + " me?";  // use restOfStatement to make a "Why do you" question
   }
   
   private String transformIsStatement(String statement)
@@ -238,7 +250,7 @@ public class Magpie
     }
     int psnOfIs = findKeyword(statement, "is", 0);
     String restOfStatement = statement.substring(0, psnOfIs).trim() + " " + statement.substring(psnOfIs+2).trim();  // restOfStatement is statement without "is"
-    return "Why is " + restOfStatement + "?";
+    return "Why is " + restOfStatement + "?";  // use restOfStatement to make a "Why is __?" question
   }
   
   private String transformAreStatement(String statement) 
@@ -252,7 +264,7 @@ public class Magpie
     }
     int psnOfAre = findKeyword(statement, "are", 0);
     String restOfStatement = statement.substring(0, psnOfAre).trim() + " " + statement.substring(psnOfAre+3).trim();  // restOfStatement is statement without "are"
-    return "Why are " + restOfStatement + "?";
+    return "Why are " + restOfStatement + "?";  // use restOfStatement to make a "Why are __?" question
   }
   
   private String transformWasToQuestion(String statement)
@@ -264,9 +276,9 @@ public class Magpie
     {
       statement = statement.substring(0, statement.length()-1);
     }
-    int psnOfWas = findKeyword(statement, "was", 0);
-    String restOfStatement = statement.substring(0, psnOfWas).trim() + " " + statement.substring(psnOfWas+3).trim();
-    return "Why was " + restOfStatement + "?";
+    int psnOfWas = findKeyword(statement, "was", 0);  
+    String restOfStatement = statement.substring(0, psnOfWas).trim() + " " + statement.substring(psnOfWas+3).trim();  // restOfStatement is statement without "was"
+    return "Why was " + restOfStatement + "?";  // use restOfStatement to make a "Why was ___?" question
   }
   
   private String transformYouAreToQuestion(String statement)
@@ -279,8 +291,51 @@ public class Magpie
       statement = statement.substring(0, statement.length()-1);
     }
     int psnOfYouAre = findKeyword(statement, "You are", 0);
-    String restOfStatement = statement.substring(0, psnOfYouAre).trim() + " " + statement.substring(psnOfYouAre+7).trim();
-    return "Why am I" + restOfStatement + "?";
+    String restOfStatement = statement.substring(0, psnOfYouAre).trim() + " " + statement.substring(psnOfYouAre+7).trim();  // restOfStatement is statement without "You are"
+    return "Why am I" + restOfStatement + "?";  // use restOfStatement to make a "Why am I __?" question
+  }
+  
+  private String transformIHaveToQuestion(String statement)
+  {
+    // Remove the final period, if there is one
+    statement = statement.trim();
+    String lastChar = statement.substring(0, statement.length()-1);
+    if (lastChar.equals("."))
+    {
+      statement = statement.substring(0, statement.length()-1);
+    }
+    int psnOfIHave = findKeyword(statement, "I have", 0);
+    String restOfStatement = statement.substring(0, psnOfIHave).trim() + " " + statement.substring(psnOfIHave+6).trim();  // restOfStatement is statement without "I have"
+    return "Why do you have" + restOfStatement + "?";  // use restOfStatement to make a "Why do you have __?" question
+  }
+  
+  private String transformYouHaveToQuestion(String statement)
+  {
+    // Remove the final period, if there is one
+    statement = statement.trim();
+    String lastChar = statement.substring(0, statement.length()-1);
+    if (lastChar.equals("."))
+    {
+      statement = statement.substring(0, statement.length()-1);
+    }
+    int psnOfYouHave = findKeyword(statement, "You have", 0);
+    String restOfStatement = statement.substring(0, psnOfYouHave).trim() + " " + statement.substring(psnOfYouHave+8).trim();  // restOfStatement is statement without "You have"
+    return "Why do I have" + restOfStatement + "?";  // use restOfStatement to make a "Why do I have __?" question
+  }
+  
+  private String transformHasToHaveQuestion(String statement)
+  {
+    // Remove the final period, if there is one
+    statement = statement.trim();
+    String lastChar = statement.substring(0, statement.length()-1);
+    if (lastChar.equals("."))
+    {
+      statement = statement.substring(0, statement.length()-1);
+    }
+    int psnOfHas = findKeyword(statement, "has", 0);
+    String nameOfOwner = statement.substring(0, psnOfHas).trim();  // gets the name of the owner
+    String nameOfPossesion = statement.substring(psnOfHas+3).trim();  // gets the object the person owns
+    return "Why does " + nameOfOwner + " have " + nameOfPossesion + "?";  // uses name of the owner and the object to create a "Why does __ have __?" question
   }
   
   /**
